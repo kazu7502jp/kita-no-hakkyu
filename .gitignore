@@ -1,0 +1,11 @@
+# 公開リポジトリなので、新聞社のファイルだけを載せる（このフォルダのほかの私物は除外）
+/*
+!/.gitignore
+!/CLAUDE.md
+!/会社概要.md
+!/情報源.md
+!/編集方針.md
+!/発行記録.md
+!/index.html
+!/archive.html
+!/issues/
