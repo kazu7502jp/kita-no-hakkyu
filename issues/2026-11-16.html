@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>北の白球新聞</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;800&family=Noto+Serif+JP:wght@400;600&family=Zen+Kaku+Gothic+New:wght@500;700&display=swap">
+<style>
+/* Layout: 和文新聞。右上に朱の縦題字、一面トップは縦見出し＋本文、下段は段組みの記事群と速報表 */
+:root {
+  --paper: #f1f2ee;
+  --ink: #1c1e22;
+  --ink-soft: #565a60;
+  --rule: #b9bcb6;
+  --ai: #1f3a5f;        /* 藍：見出し・リンク */
+  --shu: #b3261e;       /* 朱：題字 */
+  --shu-ink: #fbf7f2;
+  --band: #e4e6e0;
+  --f-display: "Shippori Mincho B1", "Yu Mincho", "Hiragino Mincho ProN", serif;
+  --f-body: "Noto Serif JP", "Yu Mincho", "Hiragino Mincho ProN", serif;
+  --f-label: "Zen Kaku Gothic New", "Yu Gothic", "Hiragino Sans", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #16181c; --ink: #e7e5df; --ink-soft: #a3a6ab; --rule: #3a3d43;
+    --ai: #9db9de; --shu: #c4483f; --shu-ink: #fff6f0; --band: #202329;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #16181c; --ink: #e7e5df; --ink-soft: #a3a6ab; --rule: #3a3d43;
+  --ai: #9db9de; --shu: #c4483f; --shu-ink: #fff6f0; --band: #202329;
+  color-scheme: dark;
+}
+body {
+  background: var(--paper); color: var(--ink);
+  font-family: var(--f-body); font-size: 15.5px; line-height: 1.85;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 20px 48px;
+}
+.sheet { max-width: 1080px; margin: 0 auto; display: grid; gap: 22px; }
+a { color: var(--ai); text-underline-offset: 3px; }
+a:focus-visible { outline: 2px solid var(--ai); outline-offset: 2px; }
+
+/* 題字まわり */
+.mast { display: grid; grid-template-columns: 1fr auto; gap: 20px; align-items: stretch; border-bottom: 3px double var(--ink); padding-bottom: 14px; }
+.mast-info { display: grid; align-content: space-between; gap: 10px; font-family: var(--f-label); font-size: 13px; color: var(--ink-soft); }
+.mast-info .date { font-family: var(--f-display); font-weight: 800; font-size: clamp(20px, 3vw, 26px); color: var(--ink); letter-spacing: .04em; }
+.mast-info .meta { display: flex; flex-wrap: wrap; gap: 4px 16px; }
+.mast-info .lead { font-family: var(--f-body); font-size: 14px; color: var(--ink); max-width: 46ch; }
+.daiji { writing-mode: vertical-rl; background: var(--shu); color: var(--shu-ink); font-family: var(--f-display); font-weight: 800; font-size: clamp(30px, 5vw, 46px); letter-spacing: .12em; padding: 14px 10px; line-height: 1.1; display: flex; align-items: center; gap: 10px; }
+.daiji small { font-size: .32em; letter-spacing: .2em; font-family: var(--f-label); font-weight: 700; }
+.gou { font-family: var(--f-label); font-weight: 700; color: var(--shu); }
+
+/* 一面トップ */
+.top { display: grid; grid-template-columns: auto 1fr; gap: 24px; border-bottom: 1px solid var(--rule); padding-bottom: 22px; }
+.top h1 { writing-mode: vertical-rl; margin: 0; font-family: var(--f-display); font-weight: 800; font-size: clamp(30px, 4.4vw, 44px); line-height: 1.25; color: var(--ink); max-height: 9.5em; border-left: 1px solid var(--rule); padding-left: 16px; }
+.top h1 .sub { display: block; font-size: .5em; color: var(--ai); margin-right: .4em; }
+.top-body { min-width: 0; display: grid; gap: 12px; align-content: start; }
+.kicker { font-family: var(--f-label); font-weight: 700; font-size: 12px; letter-spacing: .14em; color: var(--shu); }
+.lede { font-weight: 600; font-size: 17px; line-height: 1.8; margin: 0; }
+.cols { columns: 2 22em; column-gap: 28px; column-rule: 1px solid var(--rule); }
+.cols p { margin: 0 0 .8em; text-indent: 1em; }
+.src { font-family: var(--f-label); font-size: 12px; color: var(--ink-soft); }
+
+/* 下段 */
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 0; border-bottom: 1px solid var(--rule); }
+.story { padding: 4px 20px 20px; border-left: 1px solid var(--rule); min-width: 0; display: grid; gap: 8px; align-content: start; }
+.story:first-child { border-left: 0; padding-left: 0; }
+.story h2 { margin: 0; font-family: var(--f-display); font-weight: 800; font-size: 22px; line-height: 1.4; text-wrap: balance; }
+.story p { margin: 0; text-indent: 1em; }
+
+.section-title { font-family: var(--f-label); font-weight: 700; font-size: 13px; letter-spacing: .2em; color: var(--paper); background: var(--ink); display: inline-block; padding: 2px 12px; margin: 0 0 10px; }
+.board { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 28px; }
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-family: var(--f-label); font-size: 13.5px; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { font-weight: 700; color: var(--ink-soft); font-size: 12px; letter-spacing: .08em; background: var(--band); }
+td.score { font-weight: 700; white-space: nowrap; }
+.win { color: var(--shu); font-weight: 700; }
+.plan ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; font-family: var(--f-label); font-size: 13.5px; }
+.plan li { display: grid; grid-template-columns: 6.5em 1fr; gap: 8px; border-bottom: 1px dotted var(--rule); padding-bottom: 6px; }
+.plan .d { color: var(--ai); font-weight: 700; }
+
+.local { display: grid; gap: 14px; border-bottom: 1px solid var(--rule); padding-bottom: 22px; }
+.local-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; border-bottom: 2px solid var(--ai); padding-bottom: 6px; }
+.local-head .men { font-family: var(--f-display); font-weight: 800; font-size: 26px; color: var(--ai); letter-spacing: .1em; }
+.local-head span { font-family: var(--f-label); font-size: 12.5px; color: var(--ink-soft); }
+.linescore td, .linescore th { text-align: center; padding: 5px 6px; }
+.linescore td:first-child, .linescore th:first-child { text-align: left; white-space: nowrap; }
+.linescore td.r { font-weight: 700; border-left: 2px solid var(--ink); }
+.linescore caption { caption-side: top; text-align: left; font-family: var(--f-label); font-weight: 700; font-size: 13px; padding-bottom: 4px; }
+.scores { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 14px 24px; }
+.mini { font-family: var(--f-label); font-size: 13.5px; display: grid; gap: 4px; }
+.column { background: var(--band); padding: 18px 20px; display: grid; gap: 8px; }
+.column h2 { margin: 0; font-family: var(--f-display); font-size: 20px; }
+.column p { margin: 0; text-indent: 1em; max-width: 70ch; }
+
+footer { font-family: var(--f-label); font-size: 12px; color: var(--ink-soft); display: grid; gap: 6px; border-top: 3px double var(--ink); padding-top: 12px; }
+footer ol { margin: 0; padding-left: 1.4em; display: grid; gap: 2px; }
+footer a { word-break: break-all; }
+
+@media (max-width: 720px) {
+  .top { grid-template-columns: 1fr; }
+  .top h1 { writing-mode: horizontal-tb; max-height: none; border-left: 0; padding-left: 0; font-size: 28px; text-wrap: balance; }
+  .top h1 .sub { margin: 0 0 .3em; }
+  .board { grid-template-columns: 1fr; }
+  .story { border-left: 0; padding: 14px 0; border-top: 1px solid var(--rule); }
+  .story:first-child { border-top: 0; }
+  .daiji { font-size: 28px; }
+}
+</style>
+</head>
+<body>
+<div class="sheet">
+  <header class="mast">
+    <div class="mast-info">
+      <div>
+        <div class="date">令和8年（2026年）11月16日 月曜日</div>
+        <div class="meta"><span class="gou">第6号</span><span>発行：北の白球新聞社</span><span>毎週月曜発行</span></div>
+      </div>
+      <p class="lead">北海道の中学軟式野球を、毎朝一枚で。中体連もクラブも選抜も、公表された記録を出典付きで届けます。</p>
+    </div>
+    <div class="daiji">北の白球新聞<small>中学軟式野球・北海道</small></div>
+  </header>
+
+  <article class="top">
+    <h1><span class="sub">札幌・北地区の1年生選抜</span>練習会が会場・時間を変更</h1>
+    <div class="top-body">
+      <div class="kicker">一面 ／ 札幌</div>
+      <p class="lede">札幌市中学校野球協議会は11月14日、北地区1年生選抜の11月15日の練習会を、太平中の体育館で午後1時からに変更すると発表した。道内のそのほかの新着は確認できなかった。</p>
+      <div class="cols">
+        <p>協議会のお知らせ欄の最新項目は11月14日付で、「北地区1年生選抜」の練習日程変更の連絡。変更後の15日は13時から太平中の体育館で行う。詳細は協議会のお知らせ欄で確認できる。本紙の発行は16日で、当日の実施状況は確認できていない。</p>
+        <p>北海道中学軟式野球連盟の最新の更新は、前号と同じ10月29日付の2026年度選手募集要項（U-13・U-14北海道選抜）のまま。11月の大会日程の掲載はなく、Web検索でも道内の中学軟式の新しい大会情報は見つからなかった。</p>
+      </div>
+      <div class="src">[出典] <a href="https://sapporojhsbbc.wixsite.com/jhsbbc" target="_blank" rel="noopener">札幌市中学校野球協議会</a>／<a href="https://hjhrbf.wixsite.com/iarba" target="_blank" rel="noopener">北海道中学軟式野球連盟</a></div>
+    </div>
+  </article>
+
+  <section class="board">
+    <div>
+      <h2 class="section-title">結果記録</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>日付</th><th>大会</th><th>カード</th><th>スコア</th></tr></thead>
+          <tbody>
+            <tr><td>9月13日</td><td>札幌市新人戦 A組</td><td>厚別北 － 平岡</td><td class="score"><span class="win">厚別北</span> 9−1</td></tr>
+            <tr><td>9月13日</td><td>札幌市新人戦 B組</td><td>八軒東 － 米里</td><td class="score"><span class="win">八軒東</span> 2−1</td></tr>
+            <tr><td>9月13日</td><td>札幌市新人戦 C組</td><td>柏丘 － 羊丘</td><td class="score"><span class="win">柏丘</span> 4−1</td></tr>
+            <tr><td>9月13日</td><td>札幌市新人戦 D組</td><td>厚別 － 月寒</td><td class="score"><span class="win">厚別</span> 5−3</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="plan">
+      <h2 class="section-title">今後の予定</h2>
+      <ul>
+        <li><span class="d">年度内</span><span>U-13・U-14北海道選抜が千葉県の大会に出場予定（日程は連盟発表待ち）</span></li>
+        <li><span class="d">11月以降</span><span>道内は屋外シーズン終盤。大会情報は確認でき次第掲載</span></li>
+        <li><span class="d">2027年夏</span><span>第78回北海道中学校軟式野球大会（会場・日程は未発表）</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="local" aria-label="札幌面">
+    <div class="local-head"><span class="men">札幌面</span><span>札幌市の中学校野球部（中体連）の話題</span></div>
+    <section class="grid" aria-label="札幌の記事">
+      <article class="story">
+        <div class="kicker">札幌面 ／ 新着情報</div>
+        <h2>北地区1年生選抜、15日は太平中で</h2>
+        <p>札幌市中学校野球協議会は11月14日、北地区1年生選抜の11月15日の練習を13時から太平中の体育館で行うと知らせた。協議会のお知らせ欄の新着はこの1件。そのほか、札幌選抜に関する新しい告知はなかった。</p>
+        <div class="src">[出典] <a href="https://sapporojhsbbc.wixsite.com/jhsbbc" target="_blank" rel="noopener">札幌市中学校野球協議会</a></div>
+      </article>
+      <article class="story">
+        <div class="kicker">札幌面 ／ 特集 新人戦4・5日目</div>
+        <h2>各組の代表が決まるまで</h2>
+        <p>新人戦は9月12日に各組2試合、13日に各組1試合が行われた。結果表によると、13日の各組の勝者は、A組が厚別北（9−1平岡）、B組が八軒東（2−1米里）、C組が柏丘（4−1羊丘）、D組が厚別（5−3月寒）。</p>
+        <p>12日はD組の月寒が八軒に14−13で勝つ打撃戦があり、B組は山鼻・伏見が米里に4−5、啓明が八軒東に0−1と1点差で敗れた。9月27日の決勝大会では厚別北が優勝、厚別が準優勝、八軒東と柏丘が第3位となった（協議会お知らせ）。</p>
+        <div class="src">[出典] <a href="https://26b373eb-57ca-457d-bda3-40bb68475a5b.filesusr.com/ugd/4632e8_66e784afc56346bf85a61c508eba35fe.pdf" target="_blank" rel="noopener">新人戦 試合結果（9月12日）PDF</a>／<a href="https://26b373eb-57ca-457d-bda3-40bb68475a5b.filesusr.com/ugd/4632e8_018b7fd0d9cf4c8ebd7969e9acfd9ab7.pdf" target="_blank" rel="noopener">新人戦 試合結果（9月13日）PDF</a>／<a href="https://sapporojhsbbc.wixsite.com/jhsbbc/r-%E4%B8%AD%E4%BD%93%E9%80%A3%E6%96%B0%E4%BA%BA%E6%88%A6-3" target="_blank" rel="noopener">R8中体連新人戦</a></div>
+      </article>
+    </section>
+    <table class="linescore">
+      <caption>新人戦 9月13日 A組（平岸中会場）</caption>
+      <thead><tr><th>チーム</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>計</th></tr></thead>
+      <tbody>
+        <tr><td>平岡</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td><td class="r">1</td></tr>
+        <tr><td>厚別北</td><td>4</td><td>0</td><td>2</td><td>3</td><td>×</td><td class="r">9</td></tr>
+      </tbody>
+    </table>
+    <div class="scores">
+      <div class="mini">
+        <strong>【振り返り】新人戦 9月12日</strong>
+        <span>A（平岸中）　琴似 2−8 厚別北／元町 2−11 平岡</span>
+        <span>B（北陽中）　山鼻・伏見 4−5 米里／啓明 0−1 八軒東</span>
+        <span>C（篠路中）　栄町 0−2 柏丘／宮の森 1−3 羊丘</span>
+        <span>D（厚別中）　厚別 9−2 札幌／月寒 14−13 八軒</span>
+      </div>
+      <div class="mini">
+        <strong>【振り返り】新人戦 9月13日（イニング別）</strong>
+        <span>B　八軒東 000 000 2＝2／米里 000 100 0＝1</span>
+        <span>C　羊丘 000 001 0＝1／柏丘 202 000 ×＝4</span>
+        <span>D　厚別 002 020 1＝5／月寒 001 011 0＝3</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="column">
+    <h2>白球だより ── 最終回の2点</h2>
+    <p>9月13日のB組は、八軒東が7回に2点を挙げて米里を2−1で下した。結果表のイニング別スコアでは、それまで米里が4回の1点をリードしていた。D組の厚別も、3回・5回・7回に得点を重ねて月寒を5−3で振り切っている。</p>
+    <p>9月12日のD組では、月寒が八軒に14−13で勝った。計27点の打撃戦で、新人戦の記録の中でも目を引く1試合だ。新着が少ない間は、公表済みの結果表から読み取れる範囲で振り返る。</p>
+  </section>
+
+  <footer>
+    <div>本紙は公開情報をもとにAIの編集部（取材・編集・校閲）が作成しています。正式な結果・日程は各連盟の発表をご確認ください。<a href="../archive.html">バックナンバー</a></div>
+    <ol>
+      <li><a href="https://26b373eb-57ca-457d-bda3-40bb68475a5b.filesusr.com/ugd/4632e8_66e784afc56346bf85a61c508eba35fe.pdf" target="_blank" rel="noopener">新人戦 試合結果（9月12日）PDF</a></li>
+      <li><a href="https://26b373eb-57ca-457d-bda3-40bb68475a5b.filesusr.com/ugd/4632e8_018b7fd0d9cf4c8ebd7969e9acfd9ab7.pdf" target="_blank" rel="noopener">新人戦 試合結果（9月13日）PDF</a></li>
+      <li><a href="https://hjhrbf.wixsite.com/iarba" target="_blank" rel="noopener">https://hjhrbf.wixsite.com/iarba</a></li>
+      <li><a href="https://sapporojhsbbc.wixsite.com/jhsbbc" target="_blank" rel="noopener">https://sapporojhsbbc.wixsite.com/jhsbbc</a></li>
+      <li><a href="https://sapporojhsbbc.wixsite.com/jhsbbc/r-%E4%B8%AD%E4%BD%93%E9%80%A3%E6%96%B0%E4%BA%BA%E6%88%A6-3" target="_blank" rel="noopener">https://sapporojhsbbc.wixsite.com/jhsbbc/r-中体連新人戦-3</a></li>
+      <li><a href="https://sapporojhsbbc.wixsite.com/sapporojhs48" target="_blank" rel="noopener">https://sapporojhsbbc.wixsite.com/sapporojhs48</a></li>
+      <li><a href="https://sapporo-jpa.com/rubberbaseball/" target="_blank" rel="noopener">https://sapporo-jpa.com/rubberbaseball/</a></li>
+    </ol>
+  </footer>
+</div>
+</body>
+</html>
